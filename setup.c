@@ -2201,7 +2201,16 @@ const char *resolve_gitdir_gently(const char *suspect, int *return_error_code)
 /* if any standard file descriptor is missing open it to /dev/null */
 void sanitize_stdfds(void)
 {
-	int fd = xopen("/dev/null", O_RDWR);
+	int fd;
+
+	for (fd = 0; fd < 3; fd++) {
+		if (!is_valid_fd(fd))
+			break;
+	}
+	if (fd == 3)
+		return;
+
+	fd = xopen("/dev/null", O_RDWR);
 	while (fd < 2)
 		fd = xdup(fd);
 	if (fd > 2)

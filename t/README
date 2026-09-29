@@ -444,6 +444,12 @@ GIT_TEST_DISALLOW_ABBREVIATED_OPTIONS=<boolean>, when true (which is
 the default when running tests), errors out when an abbreviated option
 is used.
 
+GIT_TEST_DISALLOW_DEV_NULL=<boolean>, when true, makes the MinGW
+compatibility wrapper for open() fail with EACCES instead of opening
+the null device, for any literal "/dev/null" path. It does not affect
+opens of the null device on other platforms, nor Windows opens that go
+through a different path than this wrapper.
+
 GIT_TEST_DEFAULT_HASH=<hash-algo> specifies which hash algorithm to
 use in the test scripts. Recognized values for <hash-algo> are "sha1"
 and "sha256".

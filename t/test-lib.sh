@@ -1934,6 +1934,11 @@ test_lazy_prereq ULIMIT_FILE_DESCRIPTORS '
 	run_with_limited_open_files true
 '
 
+test_lazy_prereq STRACE '
+	test_have_prereq !MINGW,!CYGWIN &&
+	strace -f -o /dev/null true
+'
+
 build_option () {
 	git version --build-options |
 	sed -ne "s/^$1: //p"

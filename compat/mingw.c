@@ -860,9 +860,13 @@ int mingw_open (const char *filename, int oflags, ...)
 	else
 		open_fn = _wopen;
 
-	if (filename && !strcmp(filename, "/dev/null"))
+	if (filename && !strcmp(filename, "/dev/null")) {
+		if (git_env_bool("GIT_TEST_DISALLOW_DEV_NULL", 0)) {
+			errno = EACCES;
+			return -1;
+		}
 		wcscpy(wfilename, L"nul");
-	else if (xutftowcs_path(wfilename, filename) < 0)
+	} else if (xutftowcs_path(wfilename, filename) < 0)
 		return -1;
 
 	/*

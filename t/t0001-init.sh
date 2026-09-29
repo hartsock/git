@@ -852,6 +852,46 @@ test_expect_success MINGW 'redirect std handles' '
 	test_grep "Needed a single revision" output.txt
 '
 
+test_expect_success MINGW 'avoid NUL when standard fds are valid' '
+	git version >expect &&
+	GIT_TEST_DISALLOW_DEV_NULL=1 git version >actual &&
+	test_cmp expect actual
+'
+
+test_expect_success MINGW 'attempt NUL repair when a standard fd is missing' '
+	test_must_fail env \
+		GIT_TEST_DISALLOW_DEV_NULL=1 \
+		GIT_REDIRECT_STDOUT=off \
+		git version 2>err &&
+	test_grep "could not open .*dev/null.* for reading and writing" err
+'
+
+test_expect_success MINGW 'missing stdout is repaired via NUL' '
+	GIT_REDIRECT_STDOUT=off git version
+'
+
+test_expect_success MINGW 'missing stdin is repaired via NUL' '
+	GIT_REDIRECT_STDIN=off git version
+'
+
+test_expect_success MINGW 'missing stderr is repaired via NUL' '
+	GIT_REDIRECT_STDERR=off git version
+'
+
+test_expect_success !MINGW,STRACE 'avoid /dev/null open when standard fds are valid' '
+	strace -f -e trace=open,openat -o trace.out git version &&
+	! grep "/dev/null" trace.out
+'
+
+test_expect_success !MINGW,STRACE 'closed stdout still opens /dev/null to repair it' '
+	strace -f -e trace=open,openat -o trace.out git version 1>&- &&
+	grep "/dev/null" trace.out
+'
+
+test_expect_success !MINGW 'closed stdout is repaired on non-Windows' '
+	git version 1>&-
+'
+
 test_expect_success '--initial-branch' '
 	git init --initial-branch=hello initial-branch-option &&
 	git -C initial-branch-option symbolic-ref HEAD >actual &&

@@ -68,6 +68,12 @@ int is_path_owned_by_current_sid(const char *path, struct strbuf *report);
 int is_valid_win32_path(const char *path, int allow_literal_nul);
 #define is_valid_path(path) is_valid_win32_path(path, 0)
 
+static inline int mingw_is_valid_fd(int fd)
+{
+	return winansi_get_osfhandle(fd) != INVALID_HANDLE_VALUE;
+}
+#define is_valid_fd mingw_is_valid_fd
+
 /**
  * Converts UTF-8 encoded string to UTF-16LE.
  *

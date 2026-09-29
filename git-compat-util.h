@@ -269,6 +269,13 @@ static inline int git_offset_1st_component(const char *path)
 #define is_valid_path(path) 1
 #endif
 
+#ifndef is_valid_fd
+static inline int is_valid_fd(int fd)
+{
+	return fcntl(fd, F_GETFD) >= 0;
+}
+#endif
+
 #ifndef is_path_owned_by_current_user
 
 #ifdef __TANDEM
